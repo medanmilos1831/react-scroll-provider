@@ -1,14 +1,40 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.scss';
+import { ReactScrollProvider } from 'src/ReactScrollProvider';
 
-import NxWelcome from './nx-welcome';
-
-export function App() {
+const App = () => {
   return (
     <div>
-      <NxWelcome title="react-scroll-provider" />
+      <div
+        style={{
+          height: '20rem',
+          width: '100%',
+          background: 'red',
+        }}
+      >
+        <ReactScrollProvider
+          onTop={() => {
+            console.log('top top topina');
+          }}
+          onEnd={() => {
+            console.log('end');
+          }}
+        >
+          <div>
+            {new Array(50).fill(null).map((i, index: number) => {
+              return (
+                <div
+                  style={{
+                    background: index % 2 === 0 ? 'blue' : 'green',
+                    width: '100%',
+                    height: '3rem',
+                  }}
+                ></div>
+              );
+            })}
+          </div>
+        </ReactScrollProvider>
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+export { App };
