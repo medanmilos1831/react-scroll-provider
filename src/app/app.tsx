@@ -5,9 +5,9 @@ const App = () => {
     <div>
       <div
         style={{
-          height: '20rem',
+          height: '50rem',
           width: '100%',
-          background: 'red',
+          // background: 'red',
         }}
       >
         <ReactScrollProvider
@@ -19,7 +19,7 @@ const App = () => {
           }}
         >
           <div>
-            {new Array(50).fill(null).map((i, index: number) => {
+            {new Array(500).fill(null).map((i, index: number) => {
               return (
                 <ReactScrollProvider.ScrollItemObserver>
                   <div

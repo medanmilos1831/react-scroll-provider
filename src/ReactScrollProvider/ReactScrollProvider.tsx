@@ -1,4 +1,4 @@
-import { PropsWithChildren, useContext } from 'react';
+import { PropsWithChildren, useContext, useEffect, useRef } from 'react';
 import { ReactScrollContext } from './ReactScrollContext';
 
 const ReactScrollProvider = ({
@@ -6,22 +6,14 @@ const ReactScrollProvider = ({
   onTop,
   onEnd,
 }: PropsWithChildren<any>) => {
-  let options = {
-    root: document.querySelectorAll('.animate'),
-    rootMargin: '0px',
-    threshold: 1.0,
-  };
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
+      entries.forEach((entry: any) => {
         if (entry.isIntersecting) {
-          console.log('Element is in view:', entry.target);
-          // Ovde možeš da dodaš klasu ili stajl za animaciju
-          entry.target.classList.add('in-view');
+          entry.target.style.opacity = '1';
+          entry.target.style.transition = 'opacity 0.25s ease-in-out';
         } else {
-          console.log('Element is out of view:', entry.target);
-          // Ako želiš da ukloniš klasu kada je van pogleda
-          entry.target.classList.remove('in-view');
+          entry.target.style.opacity = '0';
         }
       });
     },
@@ -70,8 +62,18 @@ const ReactScrollProvider = ({
 };
 
 const ScrollItemObserver = ({ children }: PropsWithChildren) => {
+  const itemRef = useRef<HTMLDivElement>(null);
   const { observer } = useContext(ReactScrollContext);
-  return <div className="animate">{children}</div>;
+  useEffect(() => {
+    if (itemRef.current) {
+      observer.observe(itemRef.current);
+    }
+  }, []);
+  return (
+    <div ref={itemRef} className="animate">
+      {children}
+    </div>
+  );
 };
 
 ReactScrollProvider.ScrollItemObserver = ScrollItemObserver;
