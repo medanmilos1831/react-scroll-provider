@@ -21,13 +21,15 @@ const App = () => {
           <div>
             {new Array(50).fill(null).map((i, index: number) => {
               return (
-                <div
-                  style={{
-                    background: index % 2 === 0 ? 'blue' : 'green',
-                    width: '100%',
-                    height: '3rem',
-                  }}
-                ></div>
+                <ReactScrollProvider.ScrollItemObserver>
+                  <div
+                    style={{
+                      background: index % 2 === 0 ? 'blue' : 'green',
+                      width: '100%',
+                      height: '3rem',
+                    }}
+                  ></div>
+                </ReactScrollProvider.ScrollItemObserver>
               );
             })}
           </div>
