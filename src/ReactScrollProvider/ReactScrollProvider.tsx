@@ -10,16 +10,21 @@ const ReactScrollProvider = ({
     (entries) => {
       entries.forEach((entry: any) => {
         if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transition = 'opacity 0.25s ease-in-out';
+          Object.assign(
+            entry.target.style,
+            JSON.parse(entry.target.dataset.onenter)
+          );
         } else {
-          entry.target.style.opacity = '0';
+          Object.assign(
+            entry.target.style,
+            JSON.parse(entry.target.dataset.onleave)
+          );
         }
       });
     },
     {
-      threshold: 0.1, // 10% elementa mora biti vidljivo pre nego što se okida
-    }
+      threshold: 0,
+    } as any
   );
   return (
     <ReactScrollContext.Provider value={{ observer }}>
@@ -61,7 +66,11 @@ const ReactScrollProvider = ({
   );
 };
 
-const ScrollItemObserver = ({ children }: PropsWithChildren) => {
+const ScrollItemObserver = ({
+  children,
+  onEnter,
+  onLeave,
+}: PropsWithChildren<any>) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const { observer } = useContext(ReactScrollContext);
   useEffect(() => {
@@ -70,7 +79,11 @@ const ScrollItemObserver = ({ children }: PropsWithChildren) => {
     }
   }, []);
   return (
-    <div ref={itemRef} className="animate">
+    <div
+      data-onenter={JSON.stringify(onEnter)}
+      data-onleave={JSON.stringify(onLeave)}
+      ref={itemRef}
+    >
       {children}
     </div>
   );
