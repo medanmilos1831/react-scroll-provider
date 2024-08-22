@@ -5,10 +5,17 @@ const ReactScrollProvider = ({
   children,
   onTop,
   onEnd,
-}: PropsWithChildren<any>) => {
+  stagger,
+  threshold = 0.1,
+}: PropsWithChildren<{
+  onTop?: () => void;
+  onEnd?: () => void;
+  stagger?: number;
+  threshold?: number;
+}>) => {
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry: any) => {
+      entries.forEach((entry: any, index) => {
         if (entry.isIntersecting) {
           Object.assign(
             entry.target.style,
@@ -23,8 +30,8 @@ const ReactScrollProvider = ({
       });
     },
     {
-      threshold: 0,
-    } as any
+      threshold,
+    }
   );
   return (
     <ReactScrollContext.Provider value={{ observer }}>
@@ -44,17 +51,20 @@ const ReactScrollProvider = ({
             left: 0,
             top: 0,
             overflow: 'scroll',
+            scrollBehavior: 'smooth',
           }}
           onScroll={(e: any) => {
             if (e.target.scrollTop === 0) {
-              onTop();
+              if (onTop) {
+                onTop();
+              }
               return;
             }
             const scrollHeight = e.target.scrollHeight;
             const clientHeight = e.target.clientHeight;
 
             const isEnd = e.target.scrollTop + clientHeight >= scrollHeight;
-            if (isEnd) {
+            if (isEnd && onEnd) {
               onEnd();
             }
           }}

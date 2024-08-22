@@ -18,8 +18,10 @@ const App = () => {
           onEnd={() => {
             // console.log('end');
           }}
+          stagger={0.2}
+          threshold={0}
         >
-          {/* <>
+          <>
             <header
               style={{
                 backgroundColor: '#4CAF50',
@@ -376,7 +378,7 @@ const App = () => {
             >
               <p>&copy; 2024 Your Company. All rights reserved.</p>
             </footer>
-          </> */}
+          </>
           {/* <div>
             {new Array(50).fill(null).map((i, index: number) => {
               return (
@@ -403,21 +405,31 @@ const App = () => {
               );
             })}
           </div> */}
-          <Row gutter={[24, 24]}>
-            {new Array(50).fill(null).map((i, index: number) => {
+          {/* <Row gutter={[24, 24]}>
+            {new Array(150).fill(null).map((i, index: number) => {
               return (
-                <Col span={8}>
-                  <div
-                    style={{
-                      background: 'blue',
-                      height: '10rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                <Col span={8} key={index}>
+                  <ReactScrollProvider.ScrollItemObserver
+                    onEnter={{
+                      opacity: '1',
+                      transition: '0.4s',
+                    }}
+                    onLeave={{
+                      opacity: '0',
                     }}
                   >
-                    <span>milos</span>
-                  </div>
+                    <div
+                      style={{
+                        background: 'blue',
+                        height: '10rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <span>milos</span>
+                    </div>
+                  </ReactScrollProvider.ScrollItemObserver>
                 </Col>
                 // <ReactScrollProvider.ScrollItemObserver
                 //   key={index}
@@ -441,7 +453,7 @@ const App = () => {
                 // </ReactScrollProvider.ScrollItemObserver>
               );
             })}
-          </Row>
+          </Row> */}
         </ReactScrollProvider>
       </div>
     </div>
