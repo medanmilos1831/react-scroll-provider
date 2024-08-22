@@ -5,32 +5,49 @@ const ReactScrollProvider = ({
   children,
   onTop,
   onEnd,
-  stagger,
-  threshold = 0.1,
 }: PropsWithChildren<{
   onTop?: () => void;
   onEnd?: () => void;
-  stagger?: number;
-  threshold?: number;
 }>) => {
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry: any, index) => {
+      entries.forEach((entry: any) => {
         if (entry.isIntersecting) {
-          Object.assign(
-            entry.target.style,
-            JSON.parse(entry.target.dataset.onenter)
-          );
+          let list = entry.target.querySelectorAll('.animate');
+          list.forEach((el: any, index: number) => {
+            Object.assign(el.style, {
+              ...(() => {
+                return {
+                  ...JSON.parse(entry.target.dataset.onenter)[index],
+                  transition: `${
+                    Number(entry.target.dataset.duration) / list.length
+                  }s`,
+                  transitionDelay: `${
+                    (Number(entry.target.dataset.stagger) * (index + 1)) /
+                    list.length
+                  }s`,
+                };
+              })(),
+            });
+          });
         } else {
-          Object.assign(
-            entry.target.style,
-            JSON.parse(entry.target.dataset.onleave)
-          );
+          let list = entry.target.querySelectorAll('.animate');
+          list.forEach((el: any, index: number) => {
+            Object.assign(el.style, {
+              ...(() => {
+                return {
+                  ...JSON.parse(entry.target.dataset.onleave)[index],
+                  transition: '0s',
+                  transitionDelay: '0s',
+                };
+              })(),
+            });
+          });
         }
       });
     },
     {
-      threshold,
+      threshold: 0,
     }
   );
   return (
@@ -99,6 +116,43 @@ const ScrollItemObserver = ({
   );
 };
 
+const WayPoint = ({
+  children,
+  onEnter,
+  onLeave,
+  stagger = 0.4,
+  duration = 0.4,
+}: PropsWithChildren<{
+  onEnter: any;
+  onLeave: any;
+  stagger?: number;
+  duration?: number;
+}>) => {
+  const itemRef = useRef<HTMLDivElement>(null);
+  const { observer } = useContext(ReactScrollContext);
+  useEffect(() => {
+    if (itemRef.current) {
+      observer.observe(itemRef.current);
+    }
+  }, []);
+  return (
+    <div
+      data-onenter={JSON.stringify(onEnter)}
+      data-onleave={JSON.stringify(onLeave)}
+      data-duration={duration}
+      data-stagger={`${stagger}`}
+      ref={itemRef}
+      style={{
+        height: '100%',
+        width: '100%',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 ReactScrollProvider.ScrollItemObserver = ScrollItemObserver;
+ReactScrollProvider.WayPoint = WayPoint;
 
 export { ReactScrollProvider };
