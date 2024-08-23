@@ -1,1 +1,5 @@
-export { ReactScrollProvider } from './ReactScrollProvider';
+export {
+  ReactScrollProvider,
+  useScroll,
+  useWatchScroll,
+} from './ReactScrollProvider';

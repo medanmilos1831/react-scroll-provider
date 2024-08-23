@@ -1,5 +1,13 @@
-import { PropsWithChildren, useContext, useEffect, useRef } from 'react';
+import {
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { ReactScrollContext } from './ReactScrollContext';
+import { ScrollService } from './ScrollService';
 
 const ReactScrollProvider = ({
   children,
@@ -9,49 +17,16 @@ const ReactScrollProvider = ({
   onTop?: () => void;
   onEnd?: () => void;
 }>) => {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry: any) => {
-        if (entry.isIntersecting) {
-          let list = entry.target.querySelectorAll('.animate');
-          list.forEach((el: any, index: number) => {
-            Object.assign(el.style, {
-              ...(() => {
-                return {
-                  ...JSON.parse(entry.target.dataset.onenter)[index],
-                  transition: `${
-                    Number(entry.target.dataset.duration) / list.length
-                  }s`,
-                  transitionDelay: `${
-                    (Number(entry.target.dataset.stagger) * (index + 1)) /
-                    list.length
-                  }s`,
-                };
-              })(),
-            });
-          });
-        } else {
-          let list = entry.target.querySelectorAll('.animate');
-          list.forEach((el: any, index: number) => {
-            Object.assign(el.style, {
-              ...(() => {
-                return {
-                  ...JSON.parse(entry.target.dataset.onleave)[index],
-                  transition: '0s',
-                  transitionDelay: '0s',
-                };
-              })(),
-            });
-          });
-        }
-      });
-    },
-    {
-      threshold: 0,
-    }
-  );
+  const element = useRef<HTMLDivElement>(null);
+  const scroll = new ScrollService({
+    onTop,
+    onEnd,
+  });
+  useLayoutEffect(() => {
+    scroll.setElement(element.current!);
+  }, []);
   return (
-    <ReactScrollContext.Provider value={{ observer }}>
+    <ReactScrollContext.Provider value={scroll}>
       <div
         style={{
           height: '100%',
@@ -70,21 +45,8 @@ const ReactScrollProvider = ({
             overflow: 'scroll',
             scrollBehavior: 'smooth',
           }}
-          onScroll={(e: any) => {
-            if (e.target.scrollTop === 0) {
-              if (onTop) {
-                onTop();
-              }
-              return;
-            }
-            const scrollHeight = e.target.scrollHeight;
-            const clientHeight = e.target.clientHeight;
-
-            const isEnd = e.target.scrollTop + clientHeight >= scrollHeight;
-            if (isEnd && onEnd) {
-              onEnd();
-            }
-          }}
+          ref={element}
+          onScroll={scroll.onScroll}
         >
           {children}
         </div>
@@ -93,66 +55,25 @@ const ReactScrollProvider = ({
   );
 };
 
-const ScrollItemObserver = ({
-  children,
-  onEnter,
-  onLeave,
-}: PropsWithChildren<any>) => {
-  const itemRef = useRef<HTMLDivElement>(null);
-  const { observer } = useContext(ReactScrollContext);
-  useEffect(() => {
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
-    }
-  }, []);
-  return (
-    <div
-      data-onenter={JSON.stringify(onEnter)}
-      data-onleave={JSON.stringify(onLeave)}
-      ref={itemRef}
-    >
-      {children}
-    </div>
-  );
+const useScroll = () => {
+  const ctx = useContext(ReactScrollContext)!;
+  return {
+    setScroll: (scrollTo: ScrollToOptions) => {
+      ctx.getElement().scrollTo(scrollTo);
+    },
+  };
 };
 
-const WayPoint = ({
-  children,
-  onEnter,
-  onLeave,
-  stagger = 0.4,
-  duration = 0.4,
-}: PropsWithChildren<{
-  onEnter: any;
-  onLeave: any;
-  stagger?: number;
-  duration?: number;
-}>) => {
-  const itemRef = useRef<HTMLDivElement>(null);
-  const { observer } = useContext(ReactScrollContext);
+const useWatchScroll = () => {
+  const ctx = useContext(ReactScrollContext)!;
+  const [scrollPosition, setScrollPosition] = useState(0);
   useEffect(() => {
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
-    }
+    let observer = ctx.addObserver({ setScrollPosition });
+    return () => {
+      observer(setScrollPosition);
+    };
   }, []);
-  return (
-    <div
-      data-onenter={JSON.stringify(onEnter)}
-      data-onleave={JSON.stringify(onLeave)}
-      data-duration={duration}
-      data-stagger={`${stagger}`}
-      ref={itemRef}
-      style={{
-        height: '100%',
-        width: '100%',
-      }}
-    >
-      {children}
-    </div>
-  );
+  return { scrollPosition };
 };
 
-ReactScrollProvider.ScrollItemObserver = ScrollItemObserver;
-ReactScrollProvider.WayPoint = WayPoint;
-
-export { ReactScrollProvider };
+export { ReactScrollProvider, useScroll, useWatchScroll };
