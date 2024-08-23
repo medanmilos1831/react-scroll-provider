@@ -8,19 +8,15 @@ import {
 } from 'react';
 import { ReactScrollContext } from './ReactScrollContext';
 import { ScrollService } from './ScrollService';
+import { IReactScrollProvider } from './types';
 
 const ReactScrollProvider = ({
   children,
-  onTop,
-  onEnd,
-}: PropsWithChildren<{
-  onTop?: () => void;
-  onEnd?: () => void;
-}>) => {
+  ...rest
+}: PropsWithChildren<IReactScrollProvider>) => {
   const element = useRef<HTMLDivElement>(null);
   const scroll = new ScrollService({
-    onTop,
-    onEnd,
+    ...rest,
   });
   useLayoutEffect(() => {
     scroll.setElement(element.current!);
@@ -61,6 +57,7 @@ const useScroll = () => {
     setScroll: (scrollTo: ScrollToOptions) => {
       ctx.getElement().scrollTo(scrollTo);
     },
+    getScrollPosition: () => ctx.getScrollPosition(),
   };
 };
 

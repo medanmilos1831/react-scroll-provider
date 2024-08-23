@@ -5,14 +5,15 @@ import {
 } from 'src/ReactScrollProvider';
 
 const SomeElement = () => {
-  const { setScroll } = useScroll();
+  const { setScroll, getScrollPosition } = useScroll();
   return (
     <button
       onClick={() =>
-        setScroll({
-          top: 150,
-          behavior: 'smooth',
-        })
+        // setScroll({
+        //   top: 150,
+        //   behavior: 'smooth',
+        // })
+        console.log('getScrollPosition', getScrollPosition())
       }
     >
       SomeElement
@@ -35,6 +36,9 @@ const App = () => {
           }}
           onEnd={() => {
             console.log('end');
+          }}
+          onScroll={({ scrollPosition }: any) => {
+            console.log('on scrolll', scrollPosition);
           }}
         >
           <>

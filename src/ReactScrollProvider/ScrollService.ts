@@ -1,19 +1,29 @@
 import { Observable } from './Observable';
+import { IReactScrollProvider } from './types';
 
 class ScrollService extends Observable {
-  private onTop: (() => void) | undefined;
-  private onEnd: (() => void) | undefined;
+  private onTop: IReactScrollProvider['onTop'];
+  private onEnd: IReactScrollProvider['onEnd'];
+  private _onScroll: IReactScrollProvider['onScroll'];
   private element!: HTMLDivElement;
 
-  constructor({ onTop, onEnd }: { onTop?: () => void; onEnd?: () => void }) {
+  constructor({ onTop, onEnd, onScroll }: IReactScrollProvider) {
     super();
     this.onTop = onTop;
     this.onEnd = onEnd;
+    this._onScroll = onScroll;
   }
+
   setElement = (el: HTMLDivElement) => (this.element = el);
   getElement = () => this.element;
+  getScrollPosition = () => this.scrollPosition;
   onScroll = (e: React.UIEvent<HTMLDivElement>) => {
     this.scrollPosition = e.currentTarget.scrollTop;
+    if (this._onScroll) {
+      this._onScroll({
+        scrollPosition: this.scrollPosition,
+      });
+    }
     if (this.observers.length) {
       this.notifyObservers();
     }
