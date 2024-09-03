@@ -15,41 +15,78 @@ const ReactScrollProvider = ({
   ...rest
 }: PropsWithChildren<IReactScrollProvider>) => {
   const element = useRef<HTMLDivElement>(null);
-  const scroll = new ScrollService({
-    ...rest,
-  });
+
+  const scroll = new ScrollService(rest);
   useLayoutEffect(() => {
     scroll.setElement(element.current!);
   }, []);
   return (
     <ReactScrollContext.Provider value={scroll}>
+      {children}
+    </ReactScrollContext.Provider>
+  );
+};
+
+const ScrollAnchor = ({
+  children,
+  id,
+  className,
+}: PropsWithChildren<{ id: string; className?: string }>) => {
+  const el = useRef<HTMLDivElement>(null);
+  const ctx = useContext(ReactScrollContext);
+  useLayoutEffect(() => {
+    ctx?.addAnchor(id, el.current!);
+    return () => {
+      ctx?.removeAnchor(id);
+    };
+  });
+  return (
+    <div ref={el} id={id} className={className}>
+      {children}
+    </div>
+  );
+};
+
+const ScrollContainer = ({ children }: PropsWithChildren) => {
+  const { setElement, setScrollContainerBoundingTop, onScroll } =
+    useContext(ReactScrollContext)!;
+  const element = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setElement(element.current!);
+    setScrollContainerBoundingTop(
+      element.current?.getBoundingClientRect().top as number
+    );
+  }, []);
+  return (
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       <div
         style={{
           height: '100%',
           width: '100%',
-          position: 'relative',
-          overflow: 'hidden',
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          overflow: 'scroll',
+          scrollBehavior: 'smooth',
         }}
+        ref={element}
+        onScroll={onScroll}
       >
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            overflow: 'scroll',
-            scrollBehavior: 'smooth',
-          }}
-          ref={element}
-          onScroll={scroll.onScroll}
-        >
-          {children}
-        </div>
+        {children}
       </div>
-    </ReactScrollContext.Provider>
+    </div>
   );
 };
+
+ReactScrollProvider.ScrollAnchor = ScrollAnchor;
+ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 const useScroll = () => {
   const ctx = useContext(ReactScrollContext)!;
@@ -58,6 +95,8 @@ const useScroll = () => {
       ctx.getElement().scrollTo(scrollTo);
     },
     getScrollPosition: () => ctx.getScrollPosition(),
+    getAnchors: (id: string) => ctx.getAnchor(id),
+    scrollToAnchor: (anchor: string) => ctx.scrollToAnchor(anchor),
   };
 };
 
@@ -70,7 +109,7 @@ const useWatchScroll = () => {
       observer(setScrollPosition);
     };
   }, []);
-  return { scrollPosition };
+  return { scrollPosition, scrollProgress: ctx.getScrollProgress() };
 };
 
 export { ReactScrollProvider, useScroll, useWatchScroll };
