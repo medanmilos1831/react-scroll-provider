@@ -65,9 +65,12 @@ const SomeComponent = () => {
       >
         <ReactScrollProvider.ScrollContainer
           scrollContainerName="containerOne"
+          throttle={1000}
           onEnd={() => {}}
           onTop={() => {}}
-          onScroll={(obj) => {}}
+          onScroll={(obj) => {
+            console.log('obj');
+          }}
         >
           {new Array(5).fill(null).map((i, index) => {
             return (

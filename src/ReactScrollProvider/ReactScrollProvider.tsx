@@ -39,6 +39,18 @@ const ScrollContainer = ({
     });
     setState((prev) => !prev);
   }, []);
+
+  function throttle(fn: any, limit: number) {
+    let lastCall = 0;
+    return function (...args: any) {
+      const now = Date.now();
+      if (now - lastCall >= limit) {
+        lastCall = now;
+        fn(...args);
+      }
+    };
+  }
+
   return (
     <div
       style={{
@@ -59,9 +71,9 @@ const ScrollContainer = ({
           scrollBehavior: 'smooth',
         }}
         ref={element}
-        onScroll={(e) => {
+        onScroll={throttle((e: any) => {
           scroll.scrollContainers[rest.scrollContainerName].onScroll(e);
-        }}
+        }, rest.throttle ?? 0)}
       >
         {_ ? children : null}
       </div>

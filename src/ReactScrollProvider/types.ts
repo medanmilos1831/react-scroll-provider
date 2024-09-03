@@ -9,4 +9,5 @@ export interface IReactScrollProvider {
     | ((obj: { scrollPosition: number; scrollContainerName: string }) => void)
     | undefined;
   scrollContainerName: string;
+  throttle?: number;
 }
