@@ -10,52 +10,34 @@ import { ReactScrollContext } from './ReactScrollContext';
 import { ScrollService } from './ScrollService';
 import { IReactScrollProvider } from './types';
 
-const ReactScrollProvider = ({
-  children,
-  ...rest
-}: PropsWithChildren<IReactScrollProvider>) => {
-  const element = useRef<HTMLDivElement>(null);
-
-  const scroll = new ScrollService(rest);
-  useLayoutEffect(() => {
-    scroll.setElement(element.current!);
-  }, []);
+const ReactScrollProvider = ({ children }: PropsWithChildren) => {
+  const scroll = new ScrollService();
   return (
-    <ReactScrollContext.Provider value={scroll}>
+    <ReactScrollContext.Provider
+      value={{
+        scroll,
+      }}
+    >
       {children}
     </ReactScrollContext.Provider>
   );
 };
 
-const ScrollAnchor = ({
+const ScrollContainer = ({
   children,
-  id,
-  className,
-}: PropsWithChildren<{ id: string; className?: string }>) => {
-  const el = useRef<HTMLDivElement>(null);
-  const ctx = useContext(ReactScrollContext);
-  useLayoutEffect(() => {
-    ctx?.addAnchor(id, el.current!);
-    return () => {
-      ctx?.removeAnchor(id);
-    };
-  });
-  return (
-    <div ref={el} id={id} className={className}>
-      {children}
-    </div>
-  );
-};
-
-const ScrollContainer = ({ children }: PropsWithChildren) => {
-  const { setElement, setScrollContainerBoundingTop, onScroll } =
-    useContext(ReactScrollContext)!;
+  ...rest
+}: PropsWithChildren<IReactScrollProvider>) => {
+  const { scroll } = useContext(ReactScrollContext)!;
   const element = useRef<HTMLDivElement>(null);
+  const [_, setState] = useState(false);
   useEffect(() => {
-    setElement(element.current!);
-    setScrollContainerBoundingTop(
-      element.current?.getBoundingClientRect().top as number
-    );
+    scroll.createScrollContainer({
+      ...rest,
+      container: element.current!,
+      containerBoundingTop: element.current?.getBoundingClientRect()
+        .top as number,
+    });
+    setState((prev) => !prev);
   }, []);
   return (
     <div
@@ -77,10 +59,40 @@ const ScrollContainer = ({ children }: PropsWithChildren) => {
           scrollBehavior: 'smooth',
         }}
         ref={element}
-        onScroll={onScroll}
+        onScroll={(e) => {
+          scroll.scrollContainers[rest.scrollContainerName].onScroll(e);
+        }}
       >
-        {children}
+        {_ ? children : null}
       </div>
+    </div>
+  );
+};
+
+const ScrollAnchor = ({
+  children,
+  scrollContainerName,
+  id,
+  className,
+}: PropsWithChildren<{
+  scrollContainerName: string;
+  id: string;
+  className?: string;
+}>) => {
+  const el = useRef<HTMLDivElement>(null);
+  const ctx = useContext(ReactScrollContext);
+  useLayoutEffect(() => {
+    ctx?.scroll.scrollContainers[scrollContainerName].addAnchor(
+      id,
+      el.current!
+    );
+    return () => {
+      ctx?.scroll.scrollContainers[scrollContainerName].removeAnchor(id);
+    };
+  });
+  return (
+    <div ref={el} id={id} className={className}>
+      {children}
     </div>
   );
 };
@@ -88,28 +100,37 @@ const ScrollContainer = ({ children }: PropsWithChildren) => {
 ReactScrollProvider.ScrollAnchor = ScrollAnchor;
 ReactScrollProvider.ScrollContainer = ScrollContainer;
 
-const useScroll = () => {
+const useScroll = (scrollContainerName: string) => {
   const ctx = useContext(ReactScrollContext)!;
   return {
-    setScroll: (scrollTo: ScrollToOptions) => {
-      ctx.getElement().scrollTo(scrollTo);
+    getScrollPosition: () => {
+      return ctx.scroll.scrollContainers[
+        scrollContainerName
+      ].getScrollPosition();
     },
-    getScrollPosition: () => ctx.getScrollPosition(),
-    getAnchors: (id: string) => ctx.getAnchor(id),
-    scrollToAnchor: (anchor: string) => ctx.scrollToAnchor(anchor),
+    getAnchor: (id: string) =>
+      ctx.scroll.scrollContainers[scrollContainerName].getAnchor(id),
+    scrollToAnchor: (anchor: string) =>
+      ctx.scroll.scrollContainers[scrollContainerName].scrollToAnchor(anchor),
   };
 };
 
-const useWatchScroll = () => {
+const useWatchScroll = (scrollContainerName: string) => {
   const ctx = useContext(ReactScrollContext)!;
   const [scrollPosition, setScrollPosition] = useState(0);
   useEffect(() => {
-    let observer = ctx.addObserver({ setScrollPosition });
+    let observer = ctx.scroll.scrollContainers[scrollContainerName].addObserver(
+      { setScrollPosition }
+    );
     return () => {
       observer(setScrollPosition);
     };
   }, []);
-  return { scrollPosition, scrollProgress: ctx.getScrollProgress() };
+  return {
+    scrollPosition,
+    scrollProgress:
+      ctx.scroll.scrollContainers[scrollContainerName]?.getScrollProgress(),
+  };
 };
 
 export { ReactScrollProvider, useScroll, useWatchScroll };

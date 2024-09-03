@@ -1,7 +1,33 @@
-import { ReactScrollProvider, useScroll } from 'src/ReactScrollProvider';
+import {
+  ReactScrollProvider,
+  useScroll,
+  useWatchScroll,
+} from 'src/ReactScrollProvider';
+
+const InnerComponent = () => {
+  const { scrollProgress } = useWatchScroll('containerOne');
+
+  return <></>;
+};
+
+const InnerComponentTwo = () => {
+  const { getScrollPosition } = useScroll('containerOne');
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          console.log('getScrollPosition', getScrollPosition());
+        }}
+      >
+        get some
+      </button>
+    </>
+  );
+};
 
 const SomeComponent = () => {
-  const { scrollToAnchor } = useScroll();
+  const { scrollToAnchor } = useScroll('containerOne');
   return (
     <div
       style={{
@@ -37,10 +63,18 @@ const SomeComponent = () => {
           flexGrow: 1,
         }}
       >
-        <ReactScrollProvider.ScrollContainer>
+        <ReactScrollProvider.ScrollContainer
+          scrollContainerName="containerOne"
+          onEnd={() => {}}
+          onTop={() => {}}
+          onScroll={(obj) => {}}
+        >
           {new Array(5).fill(null).map((i, index) => {
             return (
-              <ReactScrollProvider.ScrollAnchor id={`pera${index}`}>
+              <ReactScrollProvider.ScrollAnchor
+                scrollContainerName={'containerOne'}
+                id={`pera${index}`}
+              >
                 <div
                   key={index}
                   style={{
@@ -53,6 +87,8 @@ const SomeComponent = () => {
               </ReactScrollProvider.ScrollAnchor>
             );
           })}
+          <InnerComponent />
+          <InnerComponentTwo />
         </ReactScrollProvider.ScrollContainer>
       </div>
     </div>

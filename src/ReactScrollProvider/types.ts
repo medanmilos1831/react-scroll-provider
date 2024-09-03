@@ -5,5 +5,8 @@ export type setScrollPosition = {
 export interface IReactScrollProvider {
   onTop?: () => void;
   onEnd?: () => void;
-  onScroll?: ((obj: { scrollPosition: number }) => void) | undefined;
+  onScroll?:
+    | ((obj: { scrollPosition: number; scrollContainerName: string }) => void)
+    | undefined;
+  scrollContainerName: string;
 }
