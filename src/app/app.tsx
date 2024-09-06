@@ -1,5 +1,6 @@
 import { ReactScrollProvider } from 'src/ReactScrollProvider';
-import { SomeComponent } from './components/SomeComponent';
+import { SomeComponentOne } from './components/SomeComponentOne';
+import { SomeComponentTwo } from './components/SomeComponentTwo';
 
 const App = () => {
   return (
@@ -10,7 +11,29 @@ const App = () => {
           width: '100vw',
         }}
       >
-        <SomeComponent />
+        <div
+          style={{
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+          }}
+        >
+          <div
+            style={{
+              width: '50%',
+            }}
+          >
+            <SomeComponentOne />
+          </div>
+          <div
+            style={{
+              width: '50%',
+              height: '50rem',
+            }}
+          >
+            <SomeComponentTwo />
+          </div>
+        </div>
       </div>
     </ReactScrollProvider>
   );

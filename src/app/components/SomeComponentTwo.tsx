@@ -4,29 +4,7 @@ import {
   useWatchScroll,
 } from 'src/ReactScrollProvider';
 
-const InnerComponent = () => {
-  const { scrollProgress } = useWatchScroll('containerOne');
-
-  return <></>;
-};
-
-const InnerComponentTwo = () => {
-  const { getScrollPosition } = useScroll('containerOne');
-
-  return (
-    <>
-      <button
-        onClick={() => {
-          console.log('getScrollPosition', getScrollPosition());
-        }}
-      >
-        get some
-      </button>
-    </>
-  );
-};
-
-const SomeComponent = () => {
+const SomeComponentTwo = () => {
   const { scrollToAnchor } = useScroll('containerOne');
   return (
     <div
@@ -65,7 +43,7 @@ const SomeComponent = () => {
         }}
       >
         <ReactScrollProvider.ScrollContainer
-          scrollContainerName="containerOne"
+          scrollContainerName="containerTwo"
           // throttle={1000}
           onEnd={() => {}}
           onTop={() => {}}
@@ -73,22 +51,11 @@ const SomeComponent = () => {
         >
           <div
             style={{
-              height: '30rem',
-              background: 'red',
+              height: '5rem',
+              background: 'gray',
             }}
           ></div>
-          {/* <div
-            style={{
-              height: '30rem',
-              background: 'red',
-            }}
-          ></div> */}
-          {/* <div
-            style={{
-              height: '30rem',
-              background: 'red',
-            }}
-          ></div> */}
+
           <div
             style={{
               height: '20rem',
@@ -99,7 +66,35 @@ const SomeComponent = () => {
           >
             <div
               style={{
-                height: '15rem',
+                height: '50%',
+                width: '50%',
+              }}
+            >
+              <ReactScrollProvider.ParallaxBanner
+                scrollContainerName="containerOne"
+                speed={50}
+              >
+                <img
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                  }}
+                  src="../../assets/skoda.jpg"
+                />
+              </ReactScrollProvider.ParallaxBanner>
+            </div>
+          </div>
+          <div
+            style={{
+              height: '40rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                height: '20%',
                 width: '50%',
               }}
             >
@@ -136,13 +131,10 @@ const SomeComponent = () => {
               </ReactScrollProvider.ScrollAnchor>
             );
           })}
-
-          <InnerComponent />
-          <InnerComponentTwo />
         </ReactScrollProvider.ScrollContainer>
       </div>
     </div>
   );
 };
 
-export { SomeComponent };
+export { SomeComponentTwo };

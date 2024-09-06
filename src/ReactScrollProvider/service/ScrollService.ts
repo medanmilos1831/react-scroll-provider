@@ -1,5 +1,5 @@
 import { ScrollContainerService } from './ScrollContainerService';
-import { IReactScrollProvider } from './types';
+import { IReactScrollProvider } from '../types';
 
 class ScrollService {
   scrollContainers: { [key: string]: ScrollContainerService } = {};

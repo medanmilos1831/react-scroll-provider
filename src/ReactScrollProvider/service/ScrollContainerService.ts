@@ -1,5 +1,5 @@
 import { Observable } from './Observable';
-import { IReactScrollProvider } from './types';
+import { IReactScrollProvider } from '../types';
 
 class ScrollContainerService extends Observable {
   private scrollContainerName!: string;

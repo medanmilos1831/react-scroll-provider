@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { ScrollService } from './ScrollService';
+import { ScrollService } from '../service/ScrollService';
 
 export const ReactScrollContext = createContext<
   | {
