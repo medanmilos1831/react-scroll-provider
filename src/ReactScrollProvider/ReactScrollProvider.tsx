@@ -6,12 +6,11 @@ import {
   useRef,
   useState,
 } from 'react';
+import { ProgressLinePointer } from './ProgressLinePointer';
 import { ReactScrollContext } from './ReactScrollContext';
 import { ScrollService } from './ScrollService';
 import { IReactScrollProvider } from './types';
-import { configConsumerProps } from 'antd/es/config-provider';
-import { constrainedMemory } from 'process';
-
+import { ScrollContainerContext } from './ScrollContainerContext';
 const ReactScrollProvider = ({ children }: PropsWithChildren) => {
   const scroll = new ScrollService();
   return (
@@ -77,7 +76,13 @@ const ScrollContainer = ({
           scroll.scrollContainers[rest.scrollContainerName].onScroll(e);
         }, rest.throttle ?? 0)}
       >
-        {_ ? children : null}
+        {_ ? (
+          <ScrollContainerContext.Provider
+            value={scroll.scrollContainers[rest.scrollContainerName]}
+          >
+            {children}
+          </ScrollContainerContext.Provider>
+        ) : null}
       </div>
     </div>
   );
@@ -111,113 +116,33 @@ const ScrollAnchor = ({
   );
 };
 
-class Pera {
-  private elementClientHeight: number | null = 0;
-  private elementRectBottom: number | null = 0;
-
-  // constructor() {
-  //   console.log('PERA CONSTRUCTOR');
-  // }
-
-  setElementClientHeight = (clientHeight: number) => {
-    this.elementClientHeight = clientHeight;
-  };
-  setElementRectBottom = (elementRectBottom: number) => {
-    this.elementRectBottom = elementRectBottom;
-  };
-}
-
-const ProgressLinePointer = ({ progress }: { progress: number }) => {
-  return (
-    <div
-      style={{
-        background: 'white',
-        position: 'absolute',
-        left: 0,
-        top: `${progress * 100}%`,
-        transform: `translateX(100%)`,
-        height: '2px',
-        width: '5rem',
-      }}
-    >
-      <div
-        style={{
-          position: 'relative',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: '1rem',
-            transform: 'translateX(100%)',
-          }}
-        >
-          <span
-            style={{
-              color: 'green',
-              fontSize: '3rem',
-              fontWeight: 900,
-            }}
-          >
-            {progress}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const ParallaxBanner = ({
   children,
-  scrollContainerName,
   speed,
 }: PropsWithChildren<{ scrollContainerName: string; speed: number }>) => {
+  const {
+    scrollContainerName,
+    intersectionObserver,
+    parallaxBanners,
+    calcParallaxProgress,
+  } = useContext(ScrollContainerContext);
   const { scrollPosition } = useWatchScroll(scrollContainerName);
-  const { getElement } = useScroll(scrollContainerName);
-  const element = useRef<any>();
-  const init = useRef<any>();
-  const isInViewPort = useRef<any>();
-  const [s, setS] = useState(0);
-  const [p, setP] = useState(0);
-  const observer = useRef(
-    new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            isInViewPort.current = true;
-          } else {
-            isInViewPort.current = false;
-          }
-          setS((prev) => prev + 1);
-        });
-      },
-      {
-        root: getElement(),
-      }
-    )
-  );
+  const bannerElement = useRef<any>();
+  const [parallaxProgres, setParallaxProgress] = useState(0);
+
   useEffect(() => {
-    observer.current.observe(element.current);
+    intersectionObserver.observe(bannerElement.current);
   }, []);
+
   useEffect(() => {
-    if (isInViewPort.current) {
-      const containerHeight = getElement().clientHeight;
-      const elementHeight = element.current.clientHeight;
-      const wrapper = containerHeight + elementHeight;
-      const elementBottomPosition =
-        element.current.getBoundingClientRect().bottom;
-      let value =
-        wrapper -
-        (elementBottomPosition - getElement().getClientRects()[0].top);
-      let bottomPercet = value / wrapper;
-      init.current = Number(bottomPercet.toFixed(3));
-      setP(() => Number(bottomPercet.toFixed(3)));
-    }
-  }, [scrollPosition, s]);
+    if (parallaxBanners.get(bannerElement.current)?.isIntersecting === false)
+      return;
+    setParallaxProgress(() => calcParallaxProgress(bannerElement.current));
+  }, [scrollPosition]);
+
   return (
     <div
-      ref={element}
+      ref={bannerElement}
       style={{
         height: '100%',
         position: 'relative',
@@ -226,7 +151,7 @@ const ParallaxBanner = ({
       }}
     >
       {/* progress line pointer */}
-      <ProgressLinePointer progress={p} />
+      <ProgressLinePointer parallaxProgres={parallaxProgres} />
       {/* progress line pointer */}
       <div
         style={{
@@ -236,11 +161,12 @@ const ParallaxBanner = ({
           opacity: 0.4,
           width: `100%`,
           height: `${
-            element?.current?.clientHeight +
-            (element?.current?.clientHeight * speed) / 100
+            bannerElement?.current?.clientHeight +
+            (bannerElement?.current?.clientHeight * speed) / 100
           }px`,
           transform: `translateY(${
-            (-p * element?.current?.clientHeight * speed) / 100
+            (-parallaxProgres * bannerElement?.current?.clientHeight * speed) /
+            100
           }px)`,
         }}
       >
@@ -249,10 +175,6 @@ const ParallaxBanner = ({
     </div>
   );
 };
-
-ReactScrollProvider.ScrollAnchor = ScrollAnchor;
-ReactScrollProvider.ParallaxBanner = ParallaxBanner;
-ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 const useScroll = (scrollContainerName: string) => {
   const ctx = useContext(ReactScrollContext)!;
@@ -263,7 +185,7 @@ const useScroll = (scrollContainerName: string) => {
       ].getScrollPosition();
     },
     getElement: () =>
-      ctx.scroll.scrollContainers[scrollContainerName].getScrollContainer(),
+      ctx.scroll.scrollContainers[scrollContainerName].getScrollContainer,
     getAnchor: (id: string) =>
       ctx.scroll.scrollContainers[scrollContainerName].getAnchor(id),
     scrollToAnchor: (anchor: string) =>
@@ -288,5 +210,9 @@ const useWatchScroll = (scrollContainerName: string) => {
       ctx.scroll.scrollContainers[scrollContainerName]?.getScrollProgress(),
   };
 };
+
+ReactScrollProvider.ScrollAnchor = ScrollAnchor;
+ReactScrollProvider.ParallaxBanner = ParallaxBanner;
+ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 export { ReactScrollProvider, useScroll, useWatchScroll };

@@ -10,6 +10,18 @@ class ScrollContainerService extends Observable {
   private onTop: IReactScrollProvider['onTop'];
   private onEnd: IReactScrollProvider['onEnd'];
   private _onScroll: IReactScrollProvider['onScroll'];
+  parallaxBanners = new Map();
+
+  intersectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry: any) => {
+        this.parallaxBanners.set(entry.target, entry);
+      });
+    },
+    {
+      root: this.scrollContainer,
+    }
+  );
 
   constructor({
     onTop,
@@ -29,6 +41,18 @@ class ScrollContainerService extends Observable {
     this.onEnd = onEnd;
     this._onScroll = onScroll;
   }
+
+  calcParallaxProgress = (bannerElement: HTMLDivElement) => {
+    const containerHeight = this.scrollContainer.clientHeight;
+    const elementHeight = bannerElement.clientHeight;
+    const wrapper = containerHeight + elementHeight;
+    const elementBottomPosition = bannerElement.getBoundingClientRect().bottom;
+    const value =
+      wrapper -
+      (elementBottomPosition - this.scrollContainer.getClientRects()[0].top);
+    const progress = value / wrapper;
+    return Number(progress.toFixed(3));
+  };
 
   onScroll = (e: React.UIEvent<HTMLDivElement>) => {
     this.scrollPosition = e.currentTarget.scrollTop;
