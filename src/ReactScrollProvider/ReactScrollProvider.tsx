@@ -1,15 +1,9 @@
-import {
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import { ReactScrollContext } from './ReactScrollContext';
-import { ScrollService } from './ScrollService';
-import { IReactScrollProvider } from './types';
-
+import { PropsWithChildren, useContext, useEffect, useState } from 'react';
+import { ScrollService } from './service/ScrollService';
+import { ParallaxBanner } from './components/ParallaxBanner';
+import { ScrollAnchor } from './components/ScrollAnchor';
+import { ScrollContainer } from './components/ScrollContainer';
+import { ReactScrollContext } from './context/ReactScrollContext';
 const ReactScrollProvider = ({ children }: PropsWithChildren) => {
   const scroll = new ScrollService();
   return (
@@ -23,95 +17,6 @@ const ReactScrollProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-const ScrollContainer = ({
-  children,
-  ...rest
-}: PropsWithChildren<IReactScrollProvider>) => {
-  const { scroll } = useContext(ReactScrollContext)!;
-  const element = useRef<HTMLDivElement>(null);
-  const [_, setState] = useState(false);
-  useEffect(() => {
-    scroll.createScrollContainer({
-      ...rest,
-      container: element.current!,
-      containerBoundingTop: element.current?.getBoundingClientRect()
-        .top as number,
-    });
-    setState((prev) => !prev);
-  }, []);
-
-  function throttle(fn: any, limit: number) {
-    let lastCall = 0;
-    return function (...args: any) {
-      const now = Date.now();
-      if (now - lastCall >= limit) {
-        lastCall = now;
-        fn(...args);
-      }
-    };
-  }
-
-  return (
-    <div
-      style={{
-        height: '100%',
-        width: '100%',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          overflow: 'scroll',
-          scrollBehavior: 'smooth',
-        }}
-        ref={element}
-        onScroll={throttle((e: any) => {
-          scroll.scrollContainers[rest.scrollContainerName].onScroll(e);
-        }, rest.throttle ?? 0)}
-      >
-        {_ ? children : null}
-      </div>
-    </div>
-  );
-};
-
-const ScrollAnchor = ({
-  children,
-  scrollContainerName,
-  id,
-  className,
-}: PropsWithChildren<{
-  scrollContainerName: string;
-  id: string;
-  className?: string;
-}>) => {
-  const el = useRef<HTMLDivElement>(null);
-  const ctx = useContext(ReactScrollContext);
-  useLayoutEffect(() => {
-    ctx?.scroll.scrollContainers[scrollContainerName].addAnchor(
-      id,
-      el.current!
-    );
-    return () => {
-      ctx?.scroll.scrollContainers[scrollContainerName].removeAnchor(id);
-    };
-  });
-  return (
-    <div ref={el} id={id} className={className}>
-      {children}
-    </div>
-  );
-};
-
-ReactScrollProvider.ScrollAnchor = ScrollAnchor;
-ReactScrollProvider.ScrollContainer = ScrollContainer;
-
 const useScroll = (scrollContainerName: string) => {
   const ctx = useContext(ReactScrollContext)!;
   return {
@@ -120,6 +25,8 @@ const useScroll = (scrollContainerName: string) => {
         scrollContainerName
       ].getScrollPosition();
     },
+    getElement: () =>
+      ctx.scroll.scrollContainers[scrollContainerName].getScrollContainer,
     getAnchor: (id: string) =>
       ctx.scroll.scrollContainers[scrollContainerName].getAnchor(id),
     scrollToAnchor: (anchor: string) =>
@@ -144,5 +51,9 @@ const useWatchScroll = (scrollContainerName: string) => {
       ctx.scroll.scrollContainers[scrollContainerName]?.getScrollProgress(),
   };
 };
+
+ReactScrollProvider.ScrollAnchor = ScrollAnchor;
+ReactScrollProvider.ParallaxBanner = ParallaxBanner;
+ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 export { ReactScrollProvider, useScroll, useWatchScroll };

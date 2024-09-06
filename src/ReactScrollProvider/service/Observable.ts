@@ -1,4 +1,4 @@
-import { setScrollPosition } from './types';
+import { setScrollPosition } from '../types';
 
 class Observable {
   protected scrollPosition = 0;
