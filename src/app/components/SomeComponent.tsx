@@ -105,7 +105,7 @@ const SomeComponent = () => {
             >
               <ReactScrollProvider.Parallax
                 scrollContainerName="containerOne"
-                speed={10}
+                speed={9}
               >
                 <img
                   style={{
@@ -117,6 +117,7 @@ const SomeComponent = () => {
               </ReactScrollProvider.Parallax>
             </div>
           </div>
+
           {new Array(5).fill(null).map((i, index) => {
             return (
               <ReactScrollProvider.ScrollAnchor

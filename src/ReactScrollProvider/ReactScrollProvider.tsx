@@ -127,6 +127,47 @@ class Pera {
   };
 }
 
+const ProgressLinePointer = ({ progress }: { progress: number }) => {
+  return (
+    <div
+      style={{
+        background: 'white',
+        position: 'absolute',
+        left: 0,
+        top: `${progress * 100}%`,
+        transform: `translateX(100%)`,
+        height: '2px',
+        width: '5rem',
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: '1rem',
+            transform: 'translateX(100%)',
+          }}
+        >
+          <span
+            style={{
+              color: 'green',
+              fontSize: '3rem',
+              fontWeight: 900,
+            }}
+          >
+            {progress}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Parallax = ({
   children,
   scrollContainerName,
@@ -182,40 +223,28 @@ const Parallax = ({
         height: '100%',
         position: 'relative',
         backgroundColor: 'black',
-        overflow: 'hidden',
+        // overflow: 'hidden',
       }}
     >
-      <div
-        style={{
-          background: 'green',
-          position: 'absolute',
-          left: 0,
-          top: `${p * 100}%`,
-          transform: `translateX(100%)`,
-          height: '2px',
-          width: '5rem',
-        }}
-      ></div>
+      {/* progress line pointer */}
+      <ProgressLinePointer progress={p} />
+      {/* progress line pointer */}
       <div
         style={{
           position: 'absolute',
           left: 0,
           top: 0,
           opacity: 0.4,
-          height: `${element?.current?.clientHeight * 2}px`,
           width: `100%`,
-          transform: `translateY(${-p * 50}%)`,
+          height: `${
+            element?.current?.clientHeight +
+            (element?.current?.clientHeight * 10 * speed) / (100 - 10 * speed)
+          }px`,
+          transform: `translateY(${-p * 10 * speed}%)`,
         }}
       >
         {children}
       </div>
-      <span
-        style={{
-          color: 'white',
-        }}
-      >
-        {p}
-      </span>
     </div>
   );
 };
