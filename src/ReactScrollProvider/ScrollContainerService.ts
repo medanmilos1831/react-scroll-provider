@@ -66,6 +66,10 @@ class ScrollContainerService extends Observable {
     return this.scrollContainerAnchorsScrollProgress;
   }
 
+  getScrollContainer() {
+    return this.scrollContainer;
+  }
+
   getScrollPosition = () => this.scrollPosition;
 
   addAnchor(id: string, el: HTMLElement) {

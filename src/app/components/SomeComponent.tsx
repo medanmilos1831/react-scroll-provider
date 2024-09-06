@@ -43,6 +43,7 @@ const SomeComponent = () => {
           background: 'yellow',
           display: 'flex',
           justifyContent: 'space-between',
+          opacity: 0.1,
         }}
       >
         <span>Link 1</span>
@@ -65,13 +66,57 @@ const SomeComponent = () => {
       >
         <ReactScrollProvider.ScrollContainer
           scrollContainerName="containerOne"
-          throttle={1000}
+          // throttle={1000}
           onEnd={() => {}}
           onTop={() => {}}
-          onScroll={(obj) => {
-            console.log('obj');
-          }}
+          onScroll={(obj) => {}}
         >
+          {/* <div
+            style={{
+              height: '30rem',
+              background: 'red',
+            }}
+          ></div> */}
+          {/* <div
+            style={{
+              height: '30rem',
+              background: 'red',
+            }}
+          ></div> */}
+          <div
+            style={{
+              height: '30rem',
+              background: 'red',
+            }}
+          ></div>
+          <div
+            style={{
+              height: '30rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                height: '15rem',
+                width: '50%',
+              }}
+            >
+              <ReactScrollProvider.Parallax
+                scrollContainerName="containerOne"
+                speed={10}
+              >
+                <img
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                  }}
+                  src="../../assets/skoda.jpg"
+                />
+              </ReactScrollProvider.Parallax>
+            </div>
+          </div>
           {new Array(5).fill(null).map((i, index) => {
             return (
               <ReactScrollProvider.ScrollAnchor
@@ -90,6 +135,7 @@ const SomeComponent = () => {
               </ReactScrollProvider.ScrollAnchor>
             );
           })}
+
           <InnerComponent />
           <InnerComponentTwo />
         </ReactScrollProvider.ScrollContainer>

@@ -9,6 +9,8 @@ import {
 import { ReactScrollContext } from './ReactScrollContext';
 import { ScrollService } from './ScrollService';
 import { IReactScrollProvider } from './types';
+import { configConsumerProps } from 'antd/es/config-provider';
+import { constrainedMemory } from 'process';
 
 const ReactScrollProvider = ({ children }: PropsWithChildren) => {
   const scroll = new ScrollService();
@@ -109,7 +111,117 @@ const ScrollAnchor = ({
   );
 };
 
+class Pera {
+  private elementClientHeight: number | null = 0;
+  private elementRectBottom: number | null = 0;
+
+  // constructor() {
+  //   console.log('PERA CONSTRUCTOR');
+  // }
+
+  setElementClientHeight = (clientHeight: number) => {
+    this.elementClientHeight = clientHeight;
+  };
+  setElementRectBottom = (elementRectBottom: number) => {
+    this.elementRectBottom = elementRectBottom;
+  };
+}
+
+const Parallax = ({
+  children,
+  scrollContainerName,
+  speed,
+}: PropsWithChildren<{ scrollContainerName: string; speed: number }>) => {
+  const { scrollPosition } = useWatchScroll(scrollContainerName);
+  const { getElement } = useScroll(scrollContainerName);
+  const element = useRef<any>();
+  const init = useRef<any>();
+  const isInViewPort = useRef<any>();
+  const progress = useRef<any>(0);
+  const [s, setS] = useState(0);
+  const [p, setP] = useState(0);
+  const observer = useRef(
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            isInViewPort.current = true;
+          } else {
+            isInViewPort.current = false;
+          }
+          setS((prev) => prev + 1);
+        });
+      },
+      {
+        root: getElement(),
+      }
+    )
+  );
+  useEffect(() => {
+    observer.current.observe(element.current);
+  }, []);
+  useEffect(() => {
+    if (isInViewPort.current) {
+      const containerHeight = getElement().clientHeight;
+      const elementHeight = element.current.clientHeight;
+      const wrapper = containerHeight + elementHeight;
+      const elementBottomPosition =
+        element.current.getBoundingClientRect().bottom;
+      let value =
+        wrapper -
+        (elementBottomPosition - getElement().getClientRects()[0].top);
+      let bottomPercet = value / wrapper;
+      init.current = Number(bottomPercet.toFixed(3));
+      setP(() => Number(bottomPercet.toFixed(3)));
+    }
+  }, [scrollPosition, s]);
+  return (
+    <div
+      ref={element}
+      style={{
+        height: '100%',
+        position: 'relative',
+        backgroundColor: 'black',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          background: 'green',
+          position: 'absolute',
+          left: 0,
+          top: `${p * 100}%`,
+          transform: `translateX(100%)`,
+          height: '2px',
+          width: '5rem',
+        }}
+      ></div>
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          opacity: 0.4,
+          height: `${element?.current?.clientHeight * 2}px`,
+          width: `100%`,
+          transform: `translateY(${-p * 50}%)`,
+        }}
+      >
+        {children}
+      </div>
+      <span
+        style={{
+          color: 'white',
+        }}
+      >
+        {p}
+      </span>
+    </div>
+  );
+};
+
 ReactScrollProvider.ScrollAnchor = ScrollAnchor;
+ReactScrollProvider.Parallax = Parallax;
 ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 const useScroll = (scrollContainerName: string) => {
@@ -120,6 +232,8 @@ const useScroll = (scrollContainerName: string) => {
         scrollContainerName
       ].getScrollPosition();
     },
+    getElement: () =>
+      ctx.scroll.scrollContainers[scrollContainerName].getScrollContainer(),
     getAnchor: (id: string) =>
       ctx.scroll.scrollContainers[scrollContainerName].getAnchor(id),
     scrollToAnchor: (anchor: string) =>
