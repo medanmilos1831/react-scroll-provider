@@ -71,27 +71,27 @@ const SomeComponent = () => {
           onTop={() => {}}
           onScroll={(obj) => {}}
         >
-          {/* <div
-            style={{
-              height: '30rem',
-              background: 'red',
-            }}
-          ></div> */}
-          {/* <div
-            style={{
-              height: '30rem',
-              background: 'red',
-            }}
-          ></div> */}
           <div
             style={{
               height: '30rem',
               background: 'red',
             }}
           ></div>
-          <div
+          {/* <div
             style={{
               height: '30rem',
+              background: 'red',
+            }}
+          ></div> */}
+          {/* <div
+            style={{
+              height: '30rem',
+              background: 'red',
+            }}
+          ></div> */}
+          <div
+            style={{
+              height: '20rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -103,9 +103,9 @@ const SomeComponent = () => {
                 width: '50%',
               }}
             >
-              <ReactScrollProvider.Parallax
+              <ReactScrollProvider.ParallaxBanner
                 scrollContainerName="containerOne"
-                speed={9}
+                speed={50}
               >
                 <img
                   style={{
@@ -114,7 +114,7 @@ const SomeComponent = () => {
                   }}
                   src="../../assets/skoda.jpg"
                 />
-              </ReactScrollProvider.Parallax>
+              </ReactScrollProvider.ParallaxBanner>
             </div>
           </div>
 

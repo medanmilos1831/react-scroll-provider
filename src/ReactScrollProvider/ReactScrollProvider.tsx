@@ -168,7 +168,7 @@ const ProgressLinePointer = ({ progress }: { progress: number }) => {
   );
 };
 
-const Parallax = ({
+const ParallaxBanner = ({
   children,
   scrollContainerName,
   speed,
@@ -178,7 +178,6 @@ const Parallax = ({
   const element = useRef<any>();
   const init = useRef<any>();
   const isInViewPort = useRef<any>();
-  const progress = useRef<any>(0);
   const [s, setS] = useState(0);
   const [p, setP] = useState(0);
   const observer = useRef(
@@ -238,9 +237,11 @@ const Parallax = ({
           width: `100%`,
           height: `${
             element?.current?.clientHeight +
-            (element?.current?.clientHeight * 10 * speed) / (100 - 10 * speed)
+            (element?.current?.clientHeight * speed) / 100
           }px`,
-          transform: `translateY(${-p * 10 * speed}%)`,
+          transform: `translateY(${
+            (-p * element?.current?.clientHeight * speed) / 100
+          }px)`,
         }}
       >
         {children}
@@ -250,7 +251,7 @@ const Parallax = ({
 };
 
 ReactScrollProvider.ScrollAnchor = ScrollAnchor;
-ReactScrollProvider.Parallax = Parallax;
+ReactScrollProvider.ParallaxBanner = ParallaxBanner;
 ReactScrollProvider.ScrollContainer = ScrollContainer;
 
 const useScroll = (scrollContainerName: string) => {
