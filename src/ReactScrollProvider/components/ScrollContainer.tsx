@@ -6,14 +6,14 @@ import {
   useEffect,
 } from 'react';
 
-import { IReactScrollProvider } from '../types';
+import { IScrollContainerProps } from '../types';
 import { ReactScrollContext } from '../context/ReactScrollContext';
 import { ScrollContainerContext } from '../context/ScrollContainerContext';
 
 const ScrollContainer = ({
   children,
   ...rest
-}: PropsWithChildren<IReactScrollProvider>) => {
+}: PropsWithChildren<IScrollContainerProps>) => {
   const { scroll } = useContext(ReactScrollContext)!;
   const element = useRef<HTMLDivElement>(null);
   const [_, setState] = useState(false);
