@@ -59,6 +59,9 @@ const useScroll = (scrollContainerName: string) => {
       ctx.scroll.scrollContainers[scrollContainerName].getAnchor(id),
     scrollToAnchor: (anchor: string) =>
       ctx.scroll.scrollContainers[scrollContainerName].scrollToAnchor(anchor),
+    scrollTo: (value: number) => {
+      ctx.scroll.scrollContainers[scrollContainerName].scrollTo(value);
+    },
   };
 };
 
@@ -101,8 +104,15 @@ const useWatchScroll = (scrollContainerName: string) => {
   };
 };
 
+const useGetScrollProvider = () => {
+  const ctx = useContext(ReactScrollContext)!;
+  return {
+    getScrollProvider: () => ctx.scroll,
+  };
+};
+
 ReactScrollProvider.ScrollAnchor = ScrollAnchor;
 ReactScrollProvider.ParallaxBanner = ParallaxBanner;
 ReactScrollProvider.ScrollContainer = ScrollContainer;
 
-export { ReactScrollProvider, useScroll, useWatchScroll };
+export { ReactScrollProvider, useScroll, useWatchScroll, useGetScrollProvider };
