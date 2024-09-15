@@ -1,9 +1,8 @@
-import { useLayoutEffect } from 'react';
 import {
   ReactScrollProvider,
+  useGetScrollProvider,
   useScroll,
   useWatchScroll,
-  useGetScrollProvider,
 } from 'src/ReactScrollProvider';
 
 const SomeComponent = ({
@@ -513,7 +512,7 @@ const App = () => {
       <br />
       <br />
       {/* ===============================================================
-      Start container in container use case
+      Start parallax show case
       =============================================================== */}
       <div>
         <h1>Parallax banner show case</h1>
@@ -608,41 +607,9 @@ const App = () => {
       <br />
       <br />
       {/* ===============================================================
-      End container in container use case
+      End parallax show case
       =============================================================== */}
     </div>
-    // <ReactScrollProvider>
-    //   <div
-    //     style={{
-    //       height: '100vh',
-    //       width: '100vw',
-    //     }}
-    //   >
-    //     <div
-    //       style={{
-    //         height: '100%',
-    //         width: '100%',
-    //         display: 'flex',
-    //       }}
-    //     >
-    //       <div
-    //         style={{
-    //           width: '50%',
-    //         }}
-    //       >
-    //         <SomeComponentOne />
-    //       </div>
-    //       <div
-    //         style={{
-    //           width: '50%',
-    //           height: '50rem',
-    //         }}
-    //       >
-    //         <SomeComponentTwo />
-    //       </div>
-    //     </div>
-    //   </div>
-    // </ReactScrollProvider>
   );
 };
 
