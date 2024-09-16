@@ -54,10 +54,7 @@ const SomeComponentOne = () => {
               background: 'red',
             }}
           >
-            <ReactScrollProvider.ParallaxBanner
-              scrollContainerName="containerOne"
-              speed={50}
-            >
+            <ReactScrollProvider.ParallaxBanner speed={50}>
               <img
                 style={{
                   height: '100%',
@@ -81,10 +78,7 @@ const SomeComponentOne = () => {
                 width: '50%',
               }}
             >
-              <ReactScrollProvider.ParallaxBanner
-                scrollContainerName="containerOne"
-                speed={50}
-              >
+              <ReactScrollProvider.ParallaxBanner speed={50}>
                 <img
                   style={{
                     height: '100%',
@@ -109,10 +103,7 @@ const SomeComponentOne = () => {
                 width: '50%',
               }}
             >
-              <ReactScrollProvider.ParallaxBanner
-                scrollContainerName="containerOne"
-                speed={50}
-              >
+              <ReactScrollProvider.ParallaxBanner speed={50}>
                 <img
                   style={{
                     height: '100%',
@@ -137,10 +128,7 @@ const SomeComponentOne = () => {
                 width: '50%',
               }}
             >
-              <ReactScrollProvider.ParallaxBanner
-                scrollContainerName="containerOne"
-                speed={50}
-              >
+              <ReactScrollProvider.ParallaxBanner speed={50}>
                 <img
                   style={{
                     height: '100%',

@@ -555,10 +555,7 @@ const App = () => {
                 </p>
               </div>
               <div></div>
-              <ReactScrollProvider.ParallaxBanner
-                scrollContainerName="parallax"
-                speed={50}
-              >
+              <ReactScrollProvider.ParallaxBanner speed={50}>
                 <img
                   style={{
                     height: '100%',

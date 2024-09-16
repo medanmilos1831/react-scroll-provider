@@ -30,7 +30,7 @@ import { ScrollContainerContext } from '../context/ScrollContainerContext';
 const ParallaxBanner = ({
   children,
   speed,
-}: PropsWithChildren<{ scrollContainerName: string; speed: number }>) => {
+}: PropsWithChildren<{ speed: number }>) => {
   const {
     scrollContainerName,
     intersectionObserver,
